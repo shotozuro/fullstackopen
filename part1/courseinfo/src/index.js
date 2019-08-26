@@ -17,9 +17,10 @@ const Part = (props) => (
   <p>{props.name} {props.exercises}</p>
 )
 
-const Total = (props) => (
-  <p>Number of exercises {props.total} </p>
-)
+const Total = ({ parts }) => {
+  const total = parts.map(part => part.exercises).reduce((prev, curr) => prev + curr)
+  return <p>Number of exercises {total} </p>
+}
 
 const App = () => {
   const course = 'Half Stack application development'
@@ -32,7 +33,7 @@ const App = () => {
     <div>
       <Header course={course} />
       <Content parts={parts} />
-      <Total total={parts.reduce((prev, curr) => (prev + curr))} />
+      <Total parts={parts} />
     </div>
   )
 }
