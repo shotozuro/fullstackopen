@@ -8,8 +8,13 @@ const App = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    setPersons([...persons, { name: newName }])
-    setNewName('')
+    const newNameIndex = persons.findIndex(person => person.name === newName)
+    if (newNameIndex > -1) {
+      window.alert(`${newName} is already added to phonebook`)
+    } else {
+      setPersons([...persons, { name: newName }])
+      setNewName('')
+    }
   }
 
   const handleOnChange = (event) => {
