@@ -3,24 +3,33 @@ import ReactDOM from 'react-dom'
 
 const App = (props) => {
   const [selected, setSelected] = useState(0)
+  const [favourite, setFavourite] = useState(0)
   const [score, setScore] = useState(Array(props.anecdotes.length).fill(0))
   const nextAnectode = () => {
     const random = Math.floor(Math.random() * props.anecdotes.length)
     setSelected(random)
   }
   const voteAnectode = () => {
+    const currentScore = score[selected] + 1
     const copy = [
       ...score.slice(0,selected),
-      score[selected] + 1,
+      currentScore,
       ...score.slice(selected+1)]
     setScore(copy)
+
+    currentScore > score[favourite] && setFavourite(selected)
   }
+
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <p>{props.anecdotes[selected]}</p>
-      <p>{score[selected]}</p>
+      <p>has {score[selected]} votes</p>
       <button onClick={() => voteAnectode()}>Vote</button>
       <button onClick={() => nextAnectode()}>Next anecdote</button>
+      <h1>Anecdote with most votes</h1>
+      <p>{props.anecdotes[favourite]}</p>
+      <p>has {score[favourite]} votes</p>
     </div>
   )
 }
