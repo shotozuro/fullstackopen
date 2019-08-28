@@ -14,7 +14,7 @@ const SearchResult = (props) => {
     ? <p>Too many matches, specify another filter</p>
     : totalCountriesFound === 1
       ? <CountryDetail country={props.countries[0]} />
-      : props.countries.map(country => <Country key={country.name} country={country} />)
+      : <Countries countries={props.countries} />
 }
 
 const CountryDetail = ({ country }) => {
@@ -32,9 +32,26 @@ const CountryDetail = ({ country }) => {
   )
 }
 
-const Country = (props) => (
-  <p>{props.country.name}</p>
-)
+const Countries = (props) => {
+  const [ selectedCountry, setSelectedCountry ] = useState(props.country)
+  const handleShowDetail = (country) => {
+    setSelectedCountry(country)
+  }
+
+  return (
+    <div>
+      {
+        props.countries
+          .map(country => <Country key={country.name} onShowDetail={() => handleShowDetail(country)} country={country} />)
+      }
+      { selectedCountry && <CountryDetail country={selectedCountry} /> }
+    </div>
+  )
+}
+
+const Country = (props) => {
+  return <p><button onClick={props.onShowDetail}>Show Detail</button> {props.country.name}</p>
+}
 
 function App () {
   const [searchText, setSearchText] = useState('')
