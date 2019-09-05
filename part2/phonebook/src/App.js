@@ -57,17 +57,28 @@ const App = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    const newNameIndex = persons.findIndex(person => person.name === newName)
-    if (newNameIndex > -1) {
-      window.alert(`${newName} is already added to phonebook`)
+    const personIndex = persons.findIndex(person => person.name.toLowerCase() === newName.toLocaleLowerCase())
+    if (~personIndex) {
+      const toBeUpdated = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+      if (toBeUpdated) {
+        const person = persons[personIndex]
+        const updatedData = { ...person, number: newPhone }
+        personServices.update(person.id, updatedData)
+          .then(response => {
+            const updatedList = [
+              ...persons.slice(0, personIndex),
+              updatedData,
+              ...persons.slice(personIndex + 1)]
+            setPersons(updatedList)
+          })
+      }
     } else {
       const newPerson = { name: newName, number: newPhone }
-
-      personServices.add(newPerson).then(response => setPersons([...persons, response]))
-
-      setNewName('')
-      setNewPhone('')
+      newName && personServices.add(newPerson).then(response => setPersons([...persons, response]))
     }
+
+    setNewName('')
+    setNewPhone('')
   }
 
   const handleNewNameChange = (event) => {

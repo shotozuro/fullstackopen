@@ -17,4 +17,9 @@ const remove = async (personId) => {
   return response.data
 }
 
-export default { getAll, add, remove }
+const update = async (personId, updatedData) => {
+  const response = await axios.put(`${BASE_URL}/${personId}`, updatedData)
+  return response.data
+}
+
+export default { getAll, add, remove, update }
