@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import personServices from './personServices'
 
 const Filter = ({ query, onChange }) => {
   return (
@@ -32,13 +32,11 @@ const Persons = ({ persons, query }) => {
 
 const Person = ({ person }) => {
   return (
-    <p>{person.name} {person.phone}</p>
+    <p>{person.name} {person.number}</p>
   )
 }
 const App = () => {
-  const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas', phone: '040-1234567' }
-  ])
+  const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newPhone, setNewPhone ] = useState('')
   const [ newNameFilter, setNewNameFilter ] = useState('')
@@ -49,7 +47,10 @@ const App = () => {
     if (newNameIndex > -1) {
       window.alert(`${newName} is already added to phonebook`)
     } else {
-      setPersons([...persons, { name: newName, phone: newPhone }])
+      const newPerson = { name: newName, number: newPhone }
+
+      personServices.add(newPerson).then(response => setPersons([...persons, response]))
+
       setNewName('')
       setNewPhone('')
     }
@@ -68,8 +69,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons')
-      .then(response => setPersons(response.data))
+    personServices.getAll().then(response => setPersons(response))
   }, [])
 
   return (
