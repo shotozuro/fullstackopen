@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import personServices from './personServices'
+import './App.css'
 
 const Filter = ({ query, onChange }) => {
   return (
@@ -11,14 +12,12 @@ const PersonForm = (props) => {
   const { newName, newPhone, onNewNameChange, onNewPhoneChange, onSubmit } = props
   return (
     <form onSubmit={onSubmit}>
-      <div>
-      name: <input value={newName} onChange={onNewNameChange} />
-      </div>
-      <div>
-      number: <input value={newPhone} onChange={onNewPhoneChange} />
-      </div>
-      <div>
-        <button type='submit'>add</button>
+      <div className='form'>
+        <label htmlFor='name'>name:</label>
+        <input id='name' value={newName} onChange={onNewNameChange} />
+        <label htmlFor='number'>number:</label>
+        <input id='number' value={newPhone} onChange={onNewPhoneChange} />
+        <button id='submit' type='submit'>add</button>
       </div>
     </form>
   )
@@ -39,7 +38,7 @@ const Persons = ({ persons, query, onRemove }) => {
 const Person = ({ person, onRemove }) => {
   const handleRemovePerson = (person) => {
     const toBeDeleted = window.confirm(`Delete ${person.name}?`)
-    if (toBeDeleted) onRemove(person.id)
+    if (toBeDeleted) onRemove(person)
   }
   return (
     <tr>
@@ -49,11 +48,35 @@ const Person = ({ person, onRemove }) => {
     </tr>
   )
 }
+
+const Notif = ({ type, content }) => {
+  const messageType = () => {
+    switch (type) {
+      case 'add': return 'success'
+      case 'update': return 'info'
+      case 'remove': return 'delete'
+      case 'error': return 'error'
+      default: return ''
+    }
+  }
+
+  return (<p className={`notification ${messageType()}`}>{content}</p>
+  )
+}
+
 const App = () => {
   const [ persons, setPersons ] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newPhone, setNewPhone ] = useState('')
   const [ newNameFilter, setNewNameFilter ] = useState('')
+  const [ message, setMessage ] = useState(null)
+
+  const setNotification = (message) => {
+    setMessage(message)
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -70,11 +93,24 @@ const App = () => {
               updatedData,
               ...persons.slice(personIndex + 1)]
             setPersons(updatedList)
+            setNotification({ type: 'update', content: `Updated ${person.name}${"'"}s phone number` })
+          })
+          .catch(() => {
+            setNotification({ type: 'error', content: `Failed to update ${person.name}${"'"}s phone number` })
           })
       }
     } else {
       const newPerson = { name: newName, number: newPhone }
-      newName && personServices.add(newPerson).then(response => setPersons([...persons, response]))
+      if (newName) {
+        personServices.add(newPerson)
+          .then(response => {
+            setPersons([...persons, response])
+            setNotification({ type: 'add', content: `Added ${newName}` })
+          })
+          .catch(() => {
+            setNotification({ type: 'error', content: `Failed to add ${newName}` })
+          })
+      }
     }
 
     setNewName('')
@@ -93,11 +129,16 @@ const App = () => {
     setNewNameFilter(event.target.value)
   }
 
-  const handleRemovePerson = (personId) => {
+  const handleRemovePerson = (person) => {
+    const personId = person.id
     personServices.remove(personId)
       .then(() => {
         const newPersonList = persons.filter(person => person.id !== personId)
         setPersons(newPersonList)
+        setNotification({ type: 'remove', content: `Deleted ${person.name}` })
+      })
+      .catch(() => {
+        setNotification({ type: 'error', content: `Failed to remove ${person.name}` })
       })
   }
 
@@ -106,8 +147,9 @@ const App = () => {
   }, [])
 
   return (
-    <div>
+    <div className={'App'}>
       <h2>Phonebook</h2>
+      { message && <Notif {...message} />}
       <Filter query={newNameFilter} onChange={handleNewFilterChange} />
 
       <h3>Add New</h3>
