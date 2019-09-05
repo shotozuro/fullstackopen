@@ -138,7 +138,7 @@ const App = () => {
         setNotification({ type: 'remove', content: `Deleted ${person.name}` })
       })
       .catch(() => {
-        setNotification({ type: 'error', content: `Failed to remove ${person.name}` })
+        setNotification({ type: 'error', content: `Information of ${person.name} has already been removed from server` })
       })
   }
 
