@@ -24,15 +24,29 @@ const PersonForm = (props) => {
   )
 }
 
-const Persons = ({ persons, query }) => {
-  return persons
-    .filter(person => person.name.toLowerCase().includes(query.toLowerCase()))
-    .map(person => <Person key={person.name} person={person} />)
+const Persons = ({ persons, query, onRemove }) => {
+  return <table>
+    <tbody>
+      {
+        persons
+          .filter(person => person.name.toLowerCase().includes(query.toLowerCase()))
+          .map(person => <Person key={person.name} person={person} onRemove={onRemove} />)
+      }
+    </tbody>
+  </table>
 }
 
-const Person = ({ person }) => {
+const Person = ({ person, onRemove }) => {
+  const handleRemovePerson = (person) => {
+    const toBeDeleted = window.confirm(`Delete ${person.name}?`)
+    if (toBeDeleted) onRemove(person.id)
+  }
   return (
-    <p>{person.name} {person.number}</p>
+    <tr>
+      <td>{person.name}</td>
+      <td>{person.number}</td>
+      <td><button onClick={() => handleRemovePerson(person)}>Delete</button></td>
+    </tr>
   )
 }
 const App = () => {
@@ -68,6 +82,14 @@ const App = () => {
     setNewNameFilter(event.target.value)
   }
 
+  const handleRemovePerson = (personId) => {
+    personServices.remove(personId)
+      .then(() => {
+        const newPersonList = persons.filter(person => person.id !== personId)
+        setPersons(newPersonList)
+      })
+  }
+
   useEffect(() => {
     personServices.getAll().then(response => setPersons(response))
   }, [])
@@ -86,7 +108,11 @@ const App = () => {
         onSubmit={handleSubmit} />
 
       <h3>Numbers</h3>
-      <Persons persons={persons} query={newNameFilter} />
+      <Persons
+        persons={persons}
+        query={newNameFilter}
+        onRemove={handleRemovePerson}
+      />
     </div>
   )
 }
