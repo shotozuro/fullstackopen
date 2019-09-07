@@ -75,7 +75,7 @@ const App = () => {
     setMessage(message)
     setTimeout(() => {
       setMessage(null)
-    }, 5000)
+    }, 3000)
   }
 
   const handleSubmit = (event) => {

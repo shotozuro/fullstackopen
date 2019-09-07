@@ -25,6 +25,9 @@
   padding: 5px 10px;
   border-radius: 3px;
   margin-bottom: 20px;
+  position: fixed;
+  right: 100px;
+  top: 100px;
 }
 
 .success {
