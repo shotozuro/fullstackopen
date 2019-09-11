@@ -7,12 +7,12 @@ const getAll = async () => {
   return response.data
 }
 
-const add = async (newPerson) => {
+const add = async newPerson => {
   const response = await axios.post(BASE_URL, newPerson)
   return response.data
 }
 
-const remove = async (personId) => {
+const remove = async personId => {
   const response = await axios.delete(`${BASE_URL}/${personId}`)
   return response.data
 }
